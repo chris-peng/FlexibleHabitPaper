@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>弹性习惯打卡表生成器</title>
+    <style>
+        /* 基础样式重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f9fafb;
+            color: #1f2937;
+            line-height: 1.5;
+            min-height: 100vh;
+        }
+
+        /* 容器样式 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* 导航栏样式 */
+        nav {
+            background-color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            padding: 1rem 2rem;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-title {
+            display: flex;
+            align-items: center;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        .nav-title i {
+            color: #3b82f6;
+            font-size: 1.5rem;
+            margin-right: 0.75rem;
+        }
+
+        .nav-buttons {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        /* 卡片样式 */
+        .habit-card {
+            background-color: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .habit-card:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 表单样式 */
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+        }
+
+        /* 按钮样式 */
+        .btn-primary {
+            background-color: #3b82f6;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary:hover {
+            background-color: #2563eb;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-secondary {
+            background-color: #e5e7eb;
+            color: #4b5563;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background-color: #d1d5db;
+        }
+
+        /* 网格布局 */
+        .grid {
+            display: grid;
+            gap: 1rem;
+        }
+		
+		#habitInfo .grid {
+			display: flex !important;
+			flex-wrap: nowrap !important; /* 禁止换行 */
+			gap: 10px !important;
+			width: 100% !important;
+			margin-bottom: 20px !important;
+		}
+		
+		#habitInfo .grid > div {
+			flex: 1 !important; /* 平均分配宽度 */
+			min-width: 0 !important; /* 允许内容自动调整 */
+			max-width: none !important;
+			white-space: normal !important;
+			word-wrap: break-word !important;
+			padding: 10px !important;
+		}
+
+        /* 间距 */
+        .space-y-3 > * + * {
+            margin-top: 0.75rem;
+        }
+
+        .space-y-4 > * + * {
+            margin-top: 1rem;
+        }
+
+        .space-y-6 > * + * {
+            margin-top: 1.5rem;
+        }
+
+        .mb-2 {
+            margin-bottom: 0.5rem;
+        }
+
+        .mb-4 {
+            margin-bottom: 1rem;
+        }
+
+        .mb-6 {
+            margin-bottom: 1.5rem;
+        }
+
+        .mb-8 {
+            margin-bottom: 2rem;
+        }
+
+        .pt-4 {
+            padding-top: 1rem;
+        }
+
+        /* 文本样式 */
+        .text-xl {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .text-2xl {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .text-3xl {
+            font-size: 1.875rem;
+            font-weight: 700;
+        }
+
+        .text-sm {
+            font-size: 0.875rem;
+        }
+
+        .text-xs {
+            font-size: 0.75rem;
+        }
+
+        .font-bold {
+            font-weight: 700;
+        }
+
+        .font-medium {
+            font-weight: 500;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-gray-500 {
+            color: #6b7280;
+        }
+
+        .text-gray-600 {
+            color: #4b5563;
+        }
+
+        .text-gray-700 {
+            color: #374151;
+        }
+
+        .text-gray-800 {
+            color: #1f2937;
+        }
+
+        .text-primary {
+            color: #3b82f6;
+        }
+
+        .text-accent {
+            color: #f59e0b;
+        }
+
+        .italic {
+            font-style: italic;
+        }
+
+        /* 表格样式 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #d1d5db;
+            padding: 0.5rem;
+            text-align: center;
+        }
+
+        th {
+            background-color: #f3f4f6;
+            font-weight: 700;
+        }
+
+        /* 弹性布局 */
+        .flex {
+            display: flex;
+        }
+
+        .items-center {
+            align-items: center;
+        }
+
+        .justify-center {
+            justify-content: center;
+        }
+
+        .justify-between {
+            justify-content: space-between;
+        }
+
+        .space-x-2 > * + * {
+            margin-left: 0.5rem;
+        }
+
+        .space-x-4 > * + * {
+            margin-left: 1rem;
+        }
+
+        .space-x-8 > * + * {
+            margin-left: 2rem;
+        }
+
+        /* 相对定位 */
+        .relative {
+            position: relative;
+        }
+
+        .absolute {
+            position: absolute;
+        }
+
+        .top-0 {
+            top: 0;
+        }
+
+        .left-0 {
+            left: 0;
+        }
+
+        .right-0 {
+            right: 0;
+        }
+
+        /* 高度设置 */
+        .h-16 {
+            height: 4rem;
+        }
+
+        .h-24 {
+            height: 6rem;
+        }
+
+        .h-1\/5 {
+            height: 20%;
+        }
+
+        .min-h-\[80vh\] {
+            min-height: 80vh;
+        }
+
+        /* 宽度设置 */
+        .w-10 {
+            width: 2.5rem;
+        }
+
+        .w-12 {
+            width: 3rem;
+        }
+
+        .w-16 {
+            width: 4rem;
+        }
+
+        .w-24 {
+            width: 6rem;
+        }
+
+        .w-32 {
+            width: 8rem;
+        }
+
+        .w-full {
+            width: 100%;
+        }
+
+        /* 边框 */
+        .border {
+            border: 1px solid #d1d5db;
+        }
+
+        .border-b-2 {
+            border-bottom: 2px solid #9ca3af;
+        }
+
+        /* 圆角 */
+        .rounded-lg {
+            border-radius: 0.5rem;
+        }
+
+        /* 溢出处理 */
+        .overflow-x-auto {
+            overflow-x: auto;
+        }
+
+        /* 显示/隐藏 */
+        .hidden {
+            display: none;
+        }
+
+        /* 打印样式 */
+        @media print {
+            /* 隐藏导航栏 */
+            nav {
+                display: none !important;
+            }
+            
+            /* 调整页面边距 */
+            body {
+                margin: 0 !important;
+                padding: 20px !important;
+            }
+            
+            /* 横向目标在打印时强制显示为一行 */
+            #habitInfo .grid {
+                display: flex !important;
+                flex-wrap: nowrap !important; /* 禁止换行 */
+                gap: 10px !important;
+                width: 100% !important;
+                margin-bottom: 20px !important;
+            }
+            
+            #habitInfo .grid > div {
+                flex: 1 !important; /* 平均分配宽度 */
+                min-width: 0 !important; /* 允许内容自动调整 */
+                max-width: none !important;
+                white-space: normal !important;
+                word-wrap: break-word !important;
+                padding: 10px !important;
+            }
+            
+            /* 调整目标内容样式 */
+            #habitInfo .grid h4 {
+                font-size: 14px !important;
+                margin-bottom: 8px !important;
+            }
+            
+            #habitInfo .grid .flex {
+                align-items: flex-start !important;
+                margin-bottom: 4px !important;
+            }
+            
+            #habitInfo .grid img {
+                width: 16px !important;
+                height: 16px !important;
+                margin-right: 6px !important;
+                margin-top: 2px !important;
+            }
+            
+            #habitInfo .grid span {
+                font-size: 12px !important;
+                line-height: 1.3 !important;
+            }
+            
+            /* 确保表格完整显示 */
+            table {
+                width: 100% !important;
+                page-break-inside: avoid !important;
+                margin-top: 20px !important;
+            }
+            
+            /* 隐藏打印和返回按钮 */
+            #printBtn, #backBtn {
+                display: none !important;
+            }
+            
+            /* 优化打印质量 */
+            .habit-card {
+                box-shadow: none !important;
+                border: none !important;
+                padding: 0 !important;
+            }
+        }
+
+        /* 自定义图标样式 */
+        .icon {
+            display: inline-block;
+            width: 1.7rem;
+            height: 1.7rem;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+		
+		.icon-normal-size {
+            display: inline-block;
+            width: 0.8rem;
+            height: 0.8rem;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+		
+		.icon-finish-0 {
+            background-image: url("data:image/png;base64,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");
+        }
+		
+		.icon-finish-1 {
+            background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAACtWK6eAAAWW0lEQVR4nO2d0XXjttLHR0ne7Q5WeU9ipoKPrsB0BetUIH8VXKqCK1ewTgWSK7Bcgegk79J2sPc9ie5v9mpzvN4lCJEECNrzOwcHwz0WCXLwxwxASDsRwzBqMYEYhgMTiGE4MIEYhgMTiGE4MIEYhgMTiGE4MIEYhgMTiGE4MIEYhgMTiGE4MIEYhgMTSEJkQCUVUBkJYAJJiB9++GFDJX/88cfPVEYCmEAS4aeffrr++++//40p33zzzf//9ttvC0xjYEwgCUBmNf3rr782+/3+lEOZTCYfvv3225/JtHZiDIoJJAFIre6pcvmcNanWObUxIBOKMSA//vhjQeRYYn4BkeTy999/X2EaA2ECGRBSq1NSq+3+kFo9B4FoqvU9qdYHDo0BMIEMCNHjFnG8xawFkayIIpeYxgCYQAaCeUcuIvcUH86Zj6zFiI4JZAAOqZWuWk3FA6LIjlRLV7Us1YqMCWQAiB6liPyLcgw3RJFraiMiJpDIED2yP//8c4N5NN99951GkQrTiIQJJDJEDxVHRmlDRRT5mdqIhAkkIk+3k3RgjkhKMaJgAokEmdVn20m6QKql70Z2YgTHBBIJUqt7qlwcsFp1RyWI6ILKhW1DicSEYgSGF4K120k+gTj+w1JuhvmBSLPj70+wa7Edv3EwgQSG1OqUDr/dN6RWTzs8grri799h1oKgbBtKBEwggaGz39LZ32K6eCBlyuUJpGRrEfk/Si2IxLahBMYEEhA6eS4e20mYdH/xfoPIo5P6CnE5Uy1EYjt+A2ICCQQdXFMrXbWaips50aOUr4DASml4445AbBtKQEwggfDp3PAecUzFAeepqM4oLmwbSiBMIAEgevhuJzmnY6/FAafq7VzG8ZhAAsCorx06o7jwHvU534JqRqlFUy3mIt9jGj0yoRg94rOdhM6s7zymvvMGgsgpUaTCfENxMUd0pRi9YQLpETqyrjzpxPyUw1oQyNErT0SRXFquiBntMYH0CO88loijwKwFcdwhDuff1MH5fd6p2DaUHplQjB6g8xZ03iVmLYhDU6usarnRkAilS8c7rnPCYS1P38ob3TCB9MCh4273DalVHx3XU4i6DUVTrZ0YnTCB9ADzA+30M4qLB1KfXHqA663FtqFEwQTSETprLpEnz0QsXQyoiCQnHNaCSC4RyQrTaIkJpCOkPNt9h+0kbfFcTtZUy3b8dsAE0gGiRyk9bCdpC9evqM4otSCSX4kiV2K0wgTSEtKcjJd3G8wmzhHIWgJAEwZvw0vHBNISRu97qlwcxBi9aUcpDVGMdtiO35aYQFrgmf/rOw/v7SRdQCQ7sW0oQTCBHAlZja4gbZiYn3JYCwKJtoKEQHKJvJL2WjCBHAmrVkvEUWC6eGC0ziUiiGRBNaO4sB+eO5KjBYIj1tLwksowUoOIrilvVh25u+BogWiKwcrJFtMwRkPbbT5HC0QhipTSsHJiGAnROuVtJRAFkVRUZxTDSJouixNdBJKLx8qJYQzMnOhRSktaC0RBJAuqGcUwUuQRcWTUrekkECbsp0zYK8w3FMNIjXMEspYOdBKIwnuBgvcCS0zDSIkbxHFN3YnOAlEQyQqRXGC6GNV3pVPbTtIW0uCK6oziopfOFAPup5TmFdT3TMyzqge/TCidIdXS7RcVIjnhsBY6VLTtF1043M+G+znlsJYx3A8dKhePxRQ6VOuVnlgM4ZdeBKJ4jrij+AIPEXGJEwpMFw+MurmMAESyoJpRXCS/DYX7UKHn4oA+doc4Csxe6E0gCjewloZtKNxA8C3gXUAcBeJYYtbCPWhqlVVHblsYCkZe38WUOSIpJUE8B2D1S68pb68CwREZjthgNnGOI9aSGDRff51kg0Cm4qDttoUhYfDKxS/V0gi/k4Q4+GW7b0itQvilV4EoOKKUhkkUSk/yCzy0fUE1o7h4RNwZ9eggOq7oZBeYLpJbTKHdS9pdYLp4oN259MyE0jt0tJ2MLJzT5lz8RlgVdoU5Og4j8ah+eA5xFLR3iVkLA66mVlkVIPKFEkguI+tstHlDlVFcJCXqNtDhruhw7zBrocMlsZhyEPSG9k7FTTC/BBGIQodbUM0oLpJYOaGtpTSkhdDb2vrQcL9raV5MGfyH52jngqqpDwVNeYMJ5KD+Heo/4bCWocM57fT9fss5jljLC0DvGd9UTb5BJJeIZIUZHcSRSwJZSDCBKITzAicsMWvBCRrO9SZ3MgA4Qp2QiwPamPTSdBu471Iaoib3PdhiCu3bUGUUFzcMWtfUwQgqEAWRrBDJBaaLQVZOhlpbTwU6YUV1RnERvBM+h3aV0iBeiJLyTihBSTWc0y5NAbf7hrX12O2KCc8gufdWNCmpNgUXiOI5UmuqFW3lhMi2RBwFposHnJDLC8ZntMY30f7/Q9pzT5WLA9pzR3uafNcLE0oUuPG1NKycQJRwjjgKxLHErAUnaGqVVQPNjWLBgH3KiF1hvqG4mOObUgLiOZCqX6KlvNEEgiMyHLHBbOIcR6wlEDRDU6sNApmKmzntKOUVwOCVy8ArRvhFU3H1yymHtSCQS6LHCjMK0QSi4IhSBg7ntGFBNaO4eEQcGfWrgah6S+d8i+ki2GIK119y/QLTxQPXzyUiE0pU6KA7GSicc+1cBh4pU4URXCPrjk56wmEtId5bIY5kU94hBJLLQJ2Ua2+oMoqLG8R5Tf3q8OyoupiivtlJDxyEud03pFYhhOlDdIEodFS90RnFRa/hnGuW0pDeQZS19ZThOa2lYTEFkfS2DYXrLaia+sIjfSGjjs6EEp3DqBEtnHO9V7edpC36rPBN1eQbRNJ5sow4chkom/BlEIEoMcM5jlAn5OKAa93h8ALz1eO53Kq+af3eCiHqILmhD0zFzZxBq5SBGEwgCiJZ8YAuMGvBEZ3CuaezdQIYbW19DDCorKU51Wq9R43zlzKClHdQgTCKBA3nnF9Hqe2+YQLI+X/h/Ldi/APPLth7K04d7Nx9M6hAFM8RvlU4J0ItEUeB6eIBJ+RifIHPKI9vjt7xy3k3VBnFxQ1+uaYelMEFovDA1tIQzuGoB4Y4CsSxxKwF52pqlVUd5zgvGXyzkx7fW3kOiOqXJFLeJARCxO015HI6Ta02CGQqbuacrxSjFgSSS08rTfhFU2r1yymHtSCQVil1CJIQiIIjSvEI5zy47zGdcK4F1Yzi4hFxZNRGA57Ps/Hr05znnioXB/j4Dh8XmEkwoSQDD3AnHcM558ilpxHP+B+M/BqRO723GmvKm5pAcunYuTnHhiqjuLhBZNfUhieeHVwXU9Q3O3nCQWDbfUNq5RLYUCQlEAVH3PIg32K6+Oo2FMRRSkOaBoOvrY8VfLPCNxeYLr7wDZ9b8rkC08UDn8slMSaUpDiMNjse6AmHtTwfbfic1wQQznHEWoyj4Rl7+YZI8s97JQatXPyyAl3G30liJCcQhRGnwAlLzFpwwmfhHEeoE3JxwGeSmgCOEc9lWvXN95iCoHTQmoqbOYNWKQkyoSQJHX4tDe9GcMTHbSgI6gonvOOfauFvdQKYxNr62PH1DT55jzmjuHhEHBl1kkwoSUI4nzL6VDzkEw5rwRG/UP2bvzulrkX/DjHditEZ9Q3vrbaYfXCOQNaSKBNKsviEc08ecEIuRm8QRUppXhBp4ga/XFMnS9ICUXBERXVGaQWRQ1OrrDrMVYz+6OibUawmJi8QwrnvNpQ65oxSpRi9g0By8Vih+hoMXJekvCvMpEleIAqOKKVdOH9EHBm1EQh8s6CaUbxBHHeIo8BMnlEIhCByShSpMN9QvCGE6zKwfs4IxLG+QRya8o5mNXEUAlEYqXI5LpzfED2uqY3AHOMbBDKq1cTRCEThfccty7lvMZsYxQTwJYFvtvuGF4KIw2s3dkpMKKOBcJ4RzjeYTdjEPCKIo0AcS8xGnm8RSp1RCYRQfk+VSwOMVB+3OlgECQ9jlu7P2iCQqXgwNt+MRiCMUlc44R2mFzji4zYUTCMgDFoLqhnFmzH5ZhQCOYxS233DdpLn4IhLHLHCNAKAOHLxnJw/Zyy+GYVAiB5LxFFgHgVOOPoXNwx/8Mt275laPWcsvkleIF1GqQO23BsA/FJKu5e3T0neN0kL5JBabdqOUk84xxFrMXoBv/iuJvqQtG+SFgij1IJqRqmFUP0fBHSC6aLxFzcMf/DLPVUuDvDLr/hlJw1Rhr9L+t3IhJIkDFJeoxQP+BJHqJDeUFzMEUkpRid8voKATz5uJxHAhxXVaH2TrEAYpTZUGcXFxxyWv83FY57C23Vdf9+J0QrGLP0Sm6a8pxzWgkD+WaE6wjc6Ya8wkyJJgfBQS2kIzfDZdhJWVG5x3FtMF1/84obhD894yTMuMF088IxzeQKfG61vJpSkaDNKKXxOJ/Q7PnfCYS1j2+qQCnTyxu0k+ERTq6x6FqXH7JvkBEL0uKfKxQGOuEMcBeZn4MQrnPAOsxY+O6qtDilw6ODbfcOg5erg+MZHYOobTbV2kghJCcTzIeooVft9AgS2Fo9f3EBgl5iGB/jlFr+8xXTxSIqUUdfi4xtIKtWaUJKgj1FK4TyaolWc54TDWhDJJSJZYRoO6NS59DTJHqNvkhGI5yj1xQTwa+DUUhom+ThhFFsdhoQOrYOWzgen4maOX0rxwHOZWFOtJNLgJARCh87Fb5TSh7YTDzhnRXVGcXGDY6+pja/AMyylYaCB9zzDqRwB511LQ6qFSH4lilzJwAwukBCjlMJ5vV40wjnnXYvxGTy+YM+PUwc7d98MLhBGk1KaR6lHHlRGfRSce0E1o7iwbShfgWe3ocooLm54dtfUR8P5S2nwO1Fk8DR4UIEwkAQdSTj9KeevMN9QXMw5fynGRzznCc7VRB8QyU4S982gAuEBbagyiovWo5TCNXLpeX7zkmFQ0ZUmTXlPOawFgXReaTrCNxpFKszoDCYQn1EKPttO0hZWyFY4/ALTRVLr70NBp9UOm4sDxHGHOArMznC9BdWM4mKwNHhCiU7MUUrheroQsON6JxzWwvV+4Xq38kphILniGb3DrIVnpKlVVvUUbX19A4OkWoMIhFHjnioXBzjijs5aYPaCp/OTWX+PzaGjbvcNg1bTi9o24JuC6y4xazn4RlOtnUQkukA8H4aOUp0mgF8DYa6lef39VW5DwS9L/FJgunhgFM8lAFx/xfUvMF1ET4MnlGgMOUopXF9Tu4rrn3Do4hxHrOWVwMCRi99kWaPrTgKAb7Rv7Jp8wwAWNQ2OKhBGiVsewFtMFw90zlwCQWcoZQTr77E4dMwNfpmKmzl+KSUgPgs3+EZTLRXqBw6DE00gdMxcBh6lPkFbKqoziotOy8tjgWexoJpRXDzyLDLq4NCetSSUBkcRSEqjlEJ7Ml4gbjCdIFaNIhXmi4TH4PUc4By/rCUCNGlKm7aYTURpUxSBMCqU0pDWwHtueCqRoE0LqhnFxWDr7zHgGWyoMoqLG57BNXU0aFcpDf2FKBIlDQ4uEEaE5EYphWad0q4K8w3FxZx2lfLC8OmE0MuL2jbQvorqjOIiuHiDC4Qb3VBlFBfBb/Rr0LZcGuZFjFQ6KdSRaicvBAYHrzSGe78k119hRsfHNwfO6TtrCURQgXiuSgR55+ELK2sr5kYXmC6ir7+HhM6nHS8XB/jlDnEUmINBOxdUM4qLoGnwhBIEHaUOE/NTDmvBEZc4YoU5CLRTFxB2tPOEw1poZ9T191CMYdD6hPqGSFdhvqG4mCOSUgIQTCCo/54qFwc44o5OV2AOClHkCoG8w6yFtmqqpUvQHzgcJdrhGAy2++ZBK5nBgH6Ui0eqxVxJfbOTngkiEDpcgROWmLXgBB2lsirATbUBR6wlofX3EOCXJX4pMF08MBrnkhC0e0W7LzBdBEmDJ5Re8R2lQm0naQvt1pSwot0nHLo4xxFrGRl0soJ7W2LWwgCQ1KD1CXyjfWpH+084rCVEn+pdIIzE2sAZxcUDnSyXxKDtpTQsfdKJoqy/98mhg23oYFNxM8cvpSQIAr+i/e8wa8E3vafBvQqEDpaLX76oHazCTA7uQdt1RnExyLJ0W7inBdWM4uKRe8qok4X7WEvkNLhXgaDy7X7Eo5SCE3IZucif8pLuh0jolQYjkktEssLsTG8CwRGlNKQn8B5xTCVxuJcF1YziIuj6e194Dlo33Ms1dfLgm1Ia+hkC6S3V6kUgKDtjvXqD2cQ5jlhL4nA7p9xPhfmG4mLO/ZSSKD6dCQbbTtIW7quiOqO46EX0vQiEBt9T5WIYaXGOSNbSgc4C8XkzaxhDQKrV+f8/nFBaQyqikyZdPjzl0DBSZE4UKaUlnQTCBHCJOApMw0gW5litV+haCwRxFIhjiWkYqdN6G8qEcjSkVvpmdru31MoYCW23obQSCKtWeqEZxTBGARN2fTeiqdZOjuBogSCOXDzezBpGghydak0ohie+g0OXSWEbUm3XS8AEciR0xgVVU3oZbRvKYT64YT44FTedljtfKyaQI9EO6bMNpe2k8FgQbCke20kQx1SMozGBtMBnibvtpPAYEGuGWDeYTZwjkLUYR2MCaQkiWSGSC0wXR08Kj4HosaHKKC562bT3WplQjBYweGvuv0MkJxzWQiTp7bsJT/HZA8e19Su0g/86yZgxgXTAs5NqqtXLdxM+gTi99sBx7SDifE2YQDpCmrOW5q+B/kpHvZKe4Jr3VLk44Jp3XLPANDpgAumIjuZMlLeYTfQyUWbuUxA5lpi1IA5NrbIq4ALBa8EE0gOM6KU0LLXSaTv/Ggpi1HnPdt+QWsVaYn4NmEB6ApFUVGcUF3OiSCktIXosEUeB6eKBa+Ri9IIJpCcQSC4Bt3sccX5dENiJ0QsmkB6hEy+oZhQXR29DOaRWG6LHVNzMOXcpRm+YQHpEOzIT9grzDaWWY+cInsJ7RBwZtdEjJpCeYZ7gs8qk70Y01dpJA4guQ3QbzCbOEchajF4xgQQAkawQyQWmC69tKESPDVVTZLjhXNfURs9MKEbPMOjrm+4KkZxwWAuR5JKXeSvMr4I4SmlYPobR/fDbmDCBBKLrNhQVGanVFtMJ53CKzOiGCSQgRIC1tNyGwmfvqXJxwGfv+GyBaQTCBBIQokCrCbZn9NHtJLZTNzAmkMAQCUppmEfQ2f/ZhpKxVMz8Zbtv2E7CZ34hetyKERQTSAQQyU4a3o3AnChSsgK2RBwFxy4e+NtcjOCYQCKAQHLx2CYCc8q/KLUQOTS1yiqPdyhGdyYUIwKIZEE1o3RlTvQoxYiCCSQSh7lF41d0G3hEHBm1EQkTSESYXxQIZInZCl4I6kS+wjQiYQKJDCJZIZILzGO5IXpcUxsRMYFEhlTLaxvKM2w7yUCYQAbA50XgM86JHmsxomMCGQhWtdbSsA1FYVn3V14IXokxCCaQgSDVatyGgjj0nYdtJxkQE8iAEEVKcbwYRCCXRI8VpjEQJpCBQSQ7+fo2lAfmHbkYg2ICGRgEksuzbShEDk2tssq2kwyOCSQBEMmCakb5yLE/6mCEwwSSAMzXn25DeSS1yqiNBDCBJAJv2AsEsuSFoG0nSQgTSEKQauVEj7UYyWACMQwHJhDDcGACMQwHJhDDcGACMQwHJhDDcGACMQwHJhDDcGACMQwHJhDDcGACMQwHJhDDcPBfe+XffeW8mxIAAAAASUVORK5CYII=");
+        }
+		
+		.icon-finish-2 {
+            background-image: url("data:image/png;base64,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");
+        }
+
+        .icon-star {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%233b82f6'%3E%3Cpath d='M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z'/%3E%3C/svg%3E");
+        }
+
+        .icon-pencil {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%233b82f6'%3E%3Cpath d='M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z'/%3E%3C/svg%3E");
+        }
+
+        .icon-plus {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z'/%3E%3C/svg%3E");
+        }
+
+        .icon-minus {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M19 13H5v-2h14v2z'/%3E%3C/svg%3E");
+        }
+
+        .icon-print {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%234b5563'%3E%3Cpath d='M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm12 6V9c0-.55-.45-1-1-1h-2v5h2c.55 0 1-.45 1-1zm-2-3h1v1h-1V9zm0 2h1v1h-1v-1z'/%3E%3C/svg%3E");
+        }
+
+        .icon-arrow-left {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%234b5563'%3E%3Cpath d='M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z'/%3E%3C/svg%3E");
+        }
+
+        .icon-github {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236b7280'%3E%3Cpath d='M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z'/%3E%3C/svg%3E");
+        }
+
+        .icon-github:hover {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%233b82f6'%3E%3Cpath d='M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z'/%3E%3C/svg%3E");
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav>
+        <div class="nav-container">
+            <div class="nav-title">
+                <div class="icon icon-star"></div>
+                <h1>弹性习惯打卡表生成器</h1>
+            </div>
+            <div class="nav-buttons">
+                <a href="https://github.com/chris-peng/FlexibleHabitPaper" target="_blank" class="flex items-center text-gray-600 hover:text-primary transition-colors">
+                    <div class="icon icon-github mr-2"></div>
+                </a>
+                <button id="printBtn" class="btn-secondary flex items-center hidden" onclick="window.print()">
+                    <div class="icon icon-print mr-2"></div>
+                    打印打卡表
+                </button>
+                <button id="backBtn" class="btn-secondary flex items-center hidden">
+                    <div class="icon icon-arrow-left mr-2"></div>
+                    返回编辑
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- 表单输入页面 -->
+        <div id="formPage" class="min-h-[80vh]">
+            <!-- 只保留表单输入区域，去掉图案说明 -->
+            <div class="habit-card">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                    <div class="icon icon-pencil mr-3"></div>
+                    设置你的弹性习惯
+                </h2>
+                
+                <form id="habitForm" class="space-y-6">
+                    <!-- 习惯名称 -->
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">习惯名称</label>
+                        <input type="text" id="habitName" placeholder="例如：坚持运动" class="form-input" required>
+                    </div>
+
+                    <!-- 承诺声明 -->
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">承诺声明</label>
+                        <textarea id="commitment" rows="3" placeholder="例如：我是一个热爱运动的人，我要练出8块腹肌" class="form-input" required></textarea>
+                    </div>
+
+                    <!-- 横向选择 -->
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">可选打卡方式 (2-4个)</label>
+                        <div id="horizontalOptions" class="space-y-3">
+                            <div class="flex items-center space-x-2">
+                                <input type="text" class="form-input" placeholder="选择1：例如跑步" required>
+                                <button type="button" class="btn-primary px-3 py-2 text-sm" onclick="addHorizontalOption()">
+                                    <div class="icon icon-plus"></div>
+                                </button>
+                            </div>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">请添加2-4个不同的打卡方式</p>
+                    </div>
+
+                    <!-- 纵向目标设置区域 -->
+                    <div id="verticalGoalsContainer" class="space-y-6">
+                        <!-- 目标设置将通过JavaScript动态生成 -->
+                    </div>
+
+                    <!-- 提交按钮 -->
+                    <div class="pt-4">
+                        <button type="submit" class="btn-primary w-full flex items-center justify-center">
+                            🧙‍♀️生成打卡表
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- 打卡表页面 -->
+        <div id="trackerPage" class="hidden min-h-[80vh]">
+            <div class="habit-card">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-2">弹性习惯打卡表</h2>
+                    <div class="flex justify-center items-center space-x-8 mb-4">
+                        <div class="flex items-center">
+                            <span class="mr-2 font-medium">姓名：</span>
+                            <div class="w-32 h-8 border-b-2 border-gray-400"></div>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="mr-2 font-medium">月份：</span>
+                            <div class="w-24 h-8 border-b-2 border-gray-400"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 习惯信息 -->
+                <div id="habitInfo" class="mb-8">
+                    <!-- 习惯信息将通过JavaScript动态生成 -->
+                </div>
+
+                <!-- 打卡表格 -->
+                <div class="overflow-x-auto">
+                    <table class="w-full border-collapse">
+                        <thead>
+                            <tr class="bg-gray-100">
+                                <th class="border border-gray-300 p-2 text-center font-bold">一</th>
+                                <th class="border border-gray-300 p-2 text-center font-bold">二</th>
+                                <th class="border border-gray-300 p-2 text-center font-bold">三</th>
+                                <th class="border border-gray-300 p-2 text-center font-bold">四</th>
+                                <th class="border border-gray-300 p-2 text-center font-bold">五</th>
+                                <th class="border border-gray-300 p-2 text-center font-bold">六</th>
+                                <th class="border border-gray-300 p-2 text-center font-bold">日</th>
+                            </tr>
+                        </thead>
+                        <tbody id="calendarBody">
+                            <!-- 日历内容将通过JavaScript动态生成 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 初始化横向选择
+        function addHorizontalOption() {
+            const container = document.getElementById('horizontalOptions');
+            const options = container.querySelectorAll('input');
+            
+            if (options.length >= 4) {
+                alert('最多只能添加4个横向选择');
+                return;
+            }
+
+            const div = document.createElement('div');
+            div.className = 'flex items-center space-x-2';
+            div.innerHTML = `
+                <input type="text" class="form-input" placeholder="选择${options.length + 1}：例如跳绳" required>
+                <button type="button" class="btn-primary px-3 py-2 text-sm" onclick="removeHorizontalOption(this)">
+                    <div class="icon icon-minus"></div>
+                </button>
+            `;
+            container.appendChild(div);
+            
+            // 更新纵向目标设置
+            updateVerticalGoals();
+            
+            // 保存到localStorage
+            saveFormData();
+        }
+
+        function removeHorizontalOption(button) {
+            const container = document.getElementById('horizontalOptions');
+            const options = container.querySelectorAll('input');
+            
+            if (options.length <= 2) {
+                alert('至少需要保留2个横向选择');
+                return;
+            }
+            
+            button.parentElement.remove();
+            updateVerticalGoals();
+            
+            // 保存到localStorage
+            saveFormData();
+        }
+
+        // 更新纵向目标设置
+        function updateVerticalGoals() {
+            const container = document.getElementById('verticalGoalsContainer');
+            const options = document.querySelectorAll('#horizontalOptions input');
+            
+            container.innerHTML = '';
+            
+            options.forEach((option, index) => {
+                const optionName = option.value || `选择${index + 1}`;
+                
+                const goalDiv = document.createElement('div');
+                goalDiv.className = 'p-4';
+                goalDiv.innerHTML = `
+                    <h4 class="font-bold text-gray-800 mb-3">${optionName} 的三级目标</h4>
+                    <div class="space-y-3" style="padding-bottom: 1rem;">
+                        <div>
+							<div class="icon-normal-size icon-finish-0"></div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">完成（最低目标）</label>
+                            <input type="text" class="form-input goal-input" data-index="${index}" data-level="basic" placeholder="例如：跑500米-1公里" required>
+                        </div>
+                        <div>
+							<div class="icon-normal-size icon-finish-1"></div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">不错呦（中等目标）</label>
+                            <input type="text" class="form-input goal-input" data-index="${index}" data-level="medium" placeholder="例如：跑1-3公里" required>
+                        </div>
+                        <div>
+							<div class="icon-normal-size icon-finish-2"></div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">超棒的（最高目标）</label>
+                            <input type="text" class="form-input goal-input" data-index="${index}" data-level="advanced" placeholder="例如：跑3公里以上" required>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(goalDiv);
+                
+                // 添加输入事件监听器，保存数据
+                const inputs = goalDiv.querySelectorAll('input');
+                inputs.forEach(input => {
+                    input.addEventListener('input', saveFormData);
+                });
+            });
+        }
+
+        // 表单提交处理
+        document.getElementById('habitForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // 收集表单数据
+            const habitName = document.getElementById('habitName').value;
+            const commitment = document.getElementById('commitment').value;
+            
+            const horizontalOptions = Array.from(document.querySelectorAll('#horizontalOptions input')).map(input => input.value);
+            
+            const verticalGoals = [];
+            const goalSections = document.querySelectorAll('#verticalGoalsContainer > div');
+            
+            goalSections.forEach((section, index) => {
+                const inputs = section.querySelectorAll('input');
+                verticalGoals.push({
+                    option: horizontalOptions[index],
+                    basic: inputs[0].value,
+                    medium: inputs[1].value,
+                    advanced: inputs[2].value
+                });
+            });
+
+            // 生成习惯信息
+            generateHabitInfo(habitName, commitment, verticalGoals);
+            
+            // 生成日历表格
+            generateCalendar();
+            
+            // 完全替换页面
+            document.getElementById('formPage').classList.add('hidden');
+            document.getElementById('trackerPage').classList.remove('hidden');
+            
+            // 显示操作按钮
+            document.getElementById('printBtn').classList.remove('hidden');
+            document.getElementById('backBtn').classList.remove('hidden');
+            
+            // 滚动到顶部
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            // 保存到localStorage
+            saveFormData();
+        });
+
+        // 返回编辑功能
+        document.getElementById('backBtn').addEventListener('click', function() {
+            // 切换回表单页面
+            document.getElementById('formPage').classList.remove('hidden');
+            document.getElementById('trackerPage').classList.add('hidden');
+            
+            // 隐藏操作按钮
+            document.getElementById('printBtn').classList.add('hidden');
+            document.getElementById('backBtn').classList.add('hidden');
+            
+            // 滚动到顶部
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // 生成习惯信息
+        function generateHabitInfo(habitName, commitment, verticalGoals) {
+            const container = document.getElementById('habitInfo');
+            
+            let html = `
+                <div class="border border-gray-200 rounded-lg p-4 mb-4" style="padding:1rem;">
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">习惯：${habitName}</h3>
+                    <p class="text-gray-700 italic">"${commitment}"</p>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+            `;
+
+            verticalGoals.forEach(goal => {
+                html += `
+                    <div class="border border-gray-200 rounded-lg p-4" style="padding:1rem;">
+                        <h4 class="font-bold text-gray-800 mb-2">${goal.option}</h4>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex items-center">
+                                <div class="icon-normal-size icon-finish-0"></div>
+                                <span><strong>完成：</strong>${goal.basic}</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="icon-normal-size icon-finish-1"></div>
+                                <span><strong>不错呦：</strong>${goal.medium}</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="icon-normal-size icon-finish-2"></div>
+                                <span><strong>超棒的：</strong>${goal.advanced}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `</div>`;
+            container.innerHTML = html;
+        }
+
+        // 生成日历表格 - 带日期横格
+        function generateCalendar() {
+            const container = document.getElementById('calendarBody');
+            container.innerHTML = '';
+            
+            // 生成5行空表格
+            for (let rowIndex = 0; rowIndex < 5; rowIndex++) {
+                const row = document.createElement('tr');
+                
+                // 一周7天的打卡格
+                for (let i = 0; i < 7; i++) {
+                    const cell = document.createElement('td');
+                    cell.className = 'border border-gray-300 p-1 text-center relative h-24';
+                    
+                    // 单元格内容：上部日期横格（占25%高度，100%宽度）+ 下部打卡区域
+                    cell.innerHTML = `
+                        <div class="absolute top-0 left-0 right-0 flex items-center justify-center" style="height: 50%;">
+                            <div class="w-full h-1" style="border-bottom: 1px solid #eee"></div>
+                        </div>
+                        <div class="pt-10">
+                            <div class="w-16 h-16 mx-auto"></div>
+                        </div>
+                    `;
+                    
+                    row.appendChild(cell);
+                }
+                
+                container.appendChild(row);
+            }
+        }
+
+        // 打印样式优化
+        window.addEventListener('beforeprint', function() {
+            document.body.classList.add('printing');
+        });
+
+        window.addEventListener('afterprint', function() {
+            document.body.classList.remove('printing');
+        });
+
+        // localStorage 功能
+        function saveFormData() {
+            try {
+                const formData = {
+                    habitName: document.getElementById('habitName').value || '',
+                    commitment: document.getElementById('commitment').value || '',
+                    horizontalOptions: Array.from(document.querySelectorAll('#horizontalOptions input')).map(input => input.value || ''),
+                    verticalGoals: []
+                };
+                
+                // 收集纵向目标数据
+                const goalSections = document.querySelectorAll('#verticalGoalsContainer > div');
+                goalSections.forEach((section, index) => {
+                    const inputs = section.querySelectorAll('input');
+                    formData.verticalGoals.push({
+                        basic: inputs[0].value || '',
+                        medium: inputs[1].value || '',
+                        advanced: inputs[2].value || ''
+                    });
+                });
+                
+                // 保存到localStorage
+                localStorage.setItem('elasticHabitData', JSON.stringify(formData));
+            } catch (error) {
+                console.error('保存数据失败:', error);
+            }
+        }
+
+        function loadFormData() {
+            try {
+                const savedData = localStorage.getItem('elasticHabitData');
+                if (!savedData) return;
+                
+                const formData = JSON.parse(savedData);
+                
+                // 恢复习惯名称和承诺
+                if (formData.habitName) {
+                    document.getElementById('habitName').value = formData.habitName;
+                }
+                
+                if (formData.commitment) {
+                    document.getElementById('commitment').value = formData.commitment;
+                }
+                
+                // 恢复横向选择
+                if (formData.horizontalOptions && formData.horizontalOptions.length >= 2) {
+                    const container = document.getElementById('horizontalOptions');
+                    container.innerHTML = '';
+                    
+                    formData.horizontalOptions.forEach((option, index) => {
+                        const div = document.createElement('div');
+                        div.className = 'flex items-center space-x-2';
+                        
+                        const buttonHtml = index === 0 ? 
+                            '<button type="button" class="btn-primary px-3 py-2 text-sm" onclick="addHorizontalOption()"><div class="icon icon-plus"></div></button>' :
+                            '<button type="button" class="btn-primary px-3 py-2 text-sm" onclick="removeHorizontalOption(this)"><div class="icon icon-minus"></div></button>';
+                        
+                        div.innerHTML = `
+                            <input type="text" class="form-input" value="${option || ''}" required>
+                            ${buttonHtml}
+                        `;
+                        container.appendChild(div);
+                    });
+                    
+                    // 更新纵向目标
+                    updateVerticalGoals();
+                    
+                    // 恢复纵向目标数据
+                    if (formData.verticalGoals && formData.verticalGoals.length === formData.horizontalOptions.length) {
+                        const goalSections = document.querySelectorAll('#verticalGoalsContainer > div');
+                        goalSections.forEach((section, index) => {
+                            const inputs = section.querySelectorAll('input');
+                            const goalData = formData.verticalGoals[index];
+                            
+                            if (goalData) {
+                                if (goalData.basic) inputs[0].value = goalData.basic;
+                                if (goalData.medium) inputs[1].value = goalData.medium;
+                                if (goalData.advanced) inputs[2].value = goalData.advanced;
+                            }
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error('加载数据失败:', error);
+            }
+        }
+
+        // 添加输入事件监听器，实时保存数据
+        function addInputListeners() {
+            // 习惯名称和承诺
+            document.getElementById('habitName').addEventListener('input', saveFormData);
+            document.getElementById('commitment').addEventListener('input', saveFormData);
+            
+            // 横向选择输入框
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.addedNodes.length) {
+                        mutation.addedNodes.forEach(function(node) {
+                            if (node.tagName === 'INPUT') {
+                                node.addEventListener('input', saveFormData);
+                            } else if (node.querySelectorAll) {
+                                node.querySelectorAll('input').forEach(input => {
+                                    input.addEventListener('input', saveFormData);
+                                });
+                            }
+                        });
+                    }
+                });
+            });
+            
+            // 观察横向选择和纵向目标容器的变化
+            observer.observe(document.getElementById('horizontalOptions'), { childList: true, subtree: true });
+            observer.observe(document.getElementById('verticalGoalsContainer'), { childList: true, subtree: true });
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 加载保存的数据
+            loadFormData();
+            
+            // 添加第二个横向选择（如果没有加载到数据）
+            const options = document.querySelectorAll('#horizontalOptions input');
+            if (options.length < 2) {
+                addHorizontalOption();
+            }
+            
+            // 监听横向选择的变化，更新纵向目标
+            document.getElementById('horizontalOptions').addEventListener('input', function(e) {
+                if (e.target.tagName === 'INPUT') {
+                    updateVerticalGoals();
+                }
+            });
+            
+            // 添加输入事件监听器
+            addInputListeners();
+        });
+    </script>
+</body>
+</html>
