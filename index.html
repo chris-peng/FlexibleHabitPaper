@@ -132,6 +132,10 @@
             gap: 1rem;
         }
 		
+		#habitInfo.mb-8 {
+			margin-bottom: 1rem;
+		}
+		
 		#habitInfo .grid {
 			display: flex !important;
 			flex-wrap: nowrap !important; /* 禁止换行 */
@@ -389,55 +393,12 @@
             /* 调整页面边距 */
             body {
                 margin: 0 !important;
-                padding: 20px !important;
-            }
-            
-            /* 横向目标在打印时强制显示为一行 */
-            #habitInfo .grid {
-                display: flex !important;
-                flex-wrap: nowrap !important; /* 禁止换行 */
-                gap: 10px !important;
-                width: 100% !important;
-                margin-bottom: 20px !important;
-            }
-            
-            #habitInfo .grid > div {
-                flex: 1 !important; /* 平均分配宽度 */
-                min-width: 0 !important; /* 允许内容自动调整 */
-                max-width: none !important;
-                white-space: normal !important;
-                word-wrap: break-word !important;
-                padding: 10px !important;
-            }
-            
-            /* 调整目标内容样式 */
-            #habitInfo .grid h4 {
-                font-size: 14px !important;
-                margin-bottom: 8px !important;
-            }
-            
-            #habitInfo .grid .flex {
-                align-items: flex-start !important;
-                margin-bottom: 4px !important;
-            }
-            
-            #habitInfo .grid img {
-                width: 16px !important;
-                height: 16px !important;
-                margin-right: 6px !important;
-                margin-top: 2px !important;
-            }
-            
-            #habitInfo .grid span {
-                font-size: 12px !important;
-                line-height: 1.3 !important;
             }
             
             /* 确保表格完整显示 */
             table {
                 width: 100% !important;
                 page-break-inside: avoid !important;
-                margin-top: 20px !important;
             }
             
             /* 隐藏打印和返回按钮 */
@@ -836,7 +797,6 @@
                 for (let i = 0; i < 7; i++) {
                     const cell = document.createElement('td');
                     cell.className = 'border border-gray-300 p-1 text-center relative h-24';
-					cell.style = 'height:5.6rem';
                     
                     // 单元格内容：上部日期横格（占25%高度，100%宽度）+ 下部打卡区域
                     cell.innerHTML = `
